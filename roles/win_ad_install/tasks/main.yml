@@ -1,0 +1,20 @@
+- name: Install AD-Domain-Services feature
+  win_feature:
+    name: AD-Domain-Services
+    include_management_tools: yes
+    include_sub_features: yes
+    state: present
+- name: Promote to domain controller
+  win_domain:
+    dns_domain_name: ad1.33b9.example.opentlc.com
+    safe_mode_password: jVMijRwLbI02gFCo2xkjlZ9lxEA7bm7zgg==
+  register: result
+- name: Reboot upon promotion
+  win_reboot:
+  when: result.reboot_required  
+- name: Prints out the domain list available
+  win_command: nltest /dclist:ad1.33b9.example.opentlc.com 
+  register: win_output
+- debug:
+    var: win_output
+    verbosity: 2
